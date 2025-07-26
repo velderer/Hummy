@@ -1,0 +1,30 @@
+{
+  "name": "hamster-game",
+  "version": "1.0.0",
+  "description": "Веб-игра с хомяком на HTML5 Canvas",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "python3 -m http.server 8000",
+    "prepare": "node prepare_deploy.js",
+    "build": "node prepare_deploy.js",
+    "deploy": "npm run build && echo 'Ready for GitHub Pages deployment'"
+  },
+  "keywords": [
+    "game",
+    "hamster",
+    "html5",
+    "canvas",
+    "javascript"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "canvas": "^2.11.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/hamster-game.git"
+  },
+  "homepage": "https://yourusername.github.io/hamster-game"
+}

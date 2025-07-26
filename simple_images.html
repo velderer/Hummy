@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Генерация изображений</title>
+</head>
+<body>
+    <h1>Генерация изображений для игры</h1>
+    <p>Нажмите кнопки для создания изображений:</p>
+    
+    <button onclick="generateBackground()">Создать Background/fon.png</button><br><br>
+    <button onclick="generateHamster()">Создать Sprites/hummy.png</button><br><br>
+    <button onclick="generateFood()">Создать Sprites/eat.png</button><br><br>
+    
+    <canvas id="canvas" style="border: 1px solid black; display: none;"></canvas>
+    
+    <script>
+        function generateBackground() {
+            const canvas = document.getElementById('canvas');
+            canvas.width = 800;
+            canvas.height = 600;
+            const ctx = canvas.getContext('2d');
+            
+            // Градиентный фон
+            const gradient = ctx.createLinearGradient(0, 0, 0, 600);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(1, '#98FB98');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 800, 600);
+            
+            // Облака
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.beginPath();
+            ctx.arc(100, 100, 30, 0, Math.PI * 2);
+            ctx.arc(130, 100, 40, 0, Math.PI * 2);
+            ctx.arc(160, 100, 30, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(600, 80, 25, 0, Math.PI * 2);
+            ctx.arc(630, 80, 35, 0, Math.PI * 2);
+            ctx.arc(660, 80, 25, 0, Math.PI * 2);
+            ctx.fill();
+            
+            downloadImage(canvas, 'Background/fon.png');
+        }
+        
+        function generateHamster() {
+            const canvas = document.getElementById('canvas');
+            canvas.width = 60;
+            canvas.height = 60;
+            const ctx = canvas.getContext('2d');
+            
+            // Тело хомяка
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(10, 20, 40, 30);
+            
+            // Голова
+            ctx.fillStyle = '#A0522D';
+            ctx.fillRect(5, 10, 25, 25);
+            
+            // Уши
+            ctx.fillStyle = '#CD853F';
+            ctx.fillRect(8, 5, 8, 8);
+            ctx.fillRect(19, 5, 8, 8);
+            
+            // Глаза
+            ctx.fillStyle = 'black';
+            ctx.fillRect(12, 18, 3, 3);
+            ctx.fillRect(20, 18, 3, 3);
+            
+            // Нос
+            ctx.fillStyle = 'pink';
+            ctx.fillRect(16, 22, 3, 2);
+            
+            // Щеки
+            ctx.fillStyle = '#FFB6C1';
+            ctx.fillRect(8, 25, 4, 4);
+            ctx.fillRect(23, 25, 4, 4);
+            
+            downloadImage(canvas, 'Sprites/hummy.png');
+        }
+        
+        function generateFood() {
+            const canvas = document.getElementById('canvas');
+            canvas.width = 30;
+            canvas.height = 30;
+            const ctx = canvas.getContext('2d');
+            
+            // Основная форма еды
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(5, 5, 20, 20);
+            
+            // Детали
+            ctx.fillStyle = '#FFA500';
+            ctx.fillRect(8, 8, 14, 14);
+            
+            // Блики
+            ctx.fillStyle = '#FFFF00';
+            ctx.fillRect(10, 10, 3, 3);
+            ctx.fillRect(18, 15, 2, 2);
+            
+            downloadImage(canvas, 'Sprites/eat.png');
+        }
+        
+        function downloadImage(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL();
+            link.click();
+            console.log(`Изображение ${filename} создано!`);
+        }
+    </script>
+</body>
+</html>
