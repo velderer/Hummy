@@ -28,6 +28,13 @@ class HamsterGame {
         this.foodSpawnTimer = 0;
         this.foodSpawnInterval = 60; // кадры между появлением еды
         
+        // Эффекты
+        this.effects = [];
+        
+        // Статистика
+        this.foodCaught = 0;
+        this.foodMissed = 0;
+        
         // Изображения
         this.images = {
             background: null,
@@ -57,31 +64,99 @@ class HamsterGame {
     
     createPlaceholderImages() {
         // Создаем canvas для placeholder изображений
-        const createPlaceholder = (width, height, color, text) => {
+        const createBackground = () => {
             const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
+            canvas.width = 800;
+            canvas.height = 600;
             const ctx = canvas.getContext('2d');
             
-            ctx.fillStyle = color;
-            ctx.fillRect(0, 0, width, height);
+            // Градиентный фон
+            const gradient = ctx.createLinearGradient(0, 0, 0, 600);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(1, '#98FB98');
             
-            ctx.fillStyle = 'white';
-            ctx.font = '12px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(text, width/2, height/2);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 800, 600);
+            
+            // Облака
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.beginPath();
+            ctx.arc(100, 100, 30, 0, Math.PI * 2);
+            ctx.arc(130, 100, 40, 0, Math.PI * 2);
+            ctx.arc(160, 100, 30, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(600, 80, 25, 0, Math.PI * 2);
+            ctx.arc(630, 80, 35, 0, Math.PI * 2);
+            ctx.arc(660, 80, 25, 0, Math.PI * 2);
+            ctx.fill();
+            
+            return canvas;
+        };
+        
+        const createHamster = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 60;
+            canvas.height = 60;
+            const ctx = canvas.getContext('2d');
+            
+            // Тело хомяка
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(10, 20, 40, 30);
+            
+            // Голова
+            ctx.fillStyle = '#A0522D';
+            ctx.fillRect(5, 10, 25, 25);
+            
+            // Уши
+            ctx.fillStyle = '#CD853F';
+            ctx.fillRect(8, 5, 8, 8);
+            ctx.fillRect(19, 5, 8, 8);
+            
+            // Глаза
+            ctx.fillStyle = 'black';
+            ctx.fillRect(12, 18, 3, 3);
+            ctx.fillRect(20, 18, 3, 3);
+            
+            // Нос
+            ctx.fillStyle = 'pink';
+            ctx.fillRect(16, 22, 3, 2);
+            
+            // Щеки
+            ctx.fillStyle = '#FFB6C1';
+            ctx.fillRect(8, 25, 4, 4);
+            ctx.fillRect(23, 25, 4, 4);
+            
+            return canvas;
+        };
+        
+        const createFood = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 30;
+            canvas.height = 30;
+            const ctx = canvas.getContext('2d');
+            
+            // Основная форма еды
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(5, 5, 20, 20);
+            
+            // Детали
+            ctx.fillStyle = '#FFA500';
+            ctx.fillRect(8, 8, 14, 14);
+            
+            // Блики
+            ctx.fillStyle = '#FFFF00';
+            ctx.fillRect(10, 10, 3, 3);
+            ctx.fillRect(18, 15, 2, 2);
             
             return canvas;
         };
         
         // Создаем placeholder изображения
-        const bgCanvas = createPlaceholder(800, 600, '#87CEEB', 'Background');
-        const hamsterCanvas = createPlaceholder(60, 60, '#8B4513', 'Hamster');
-        const foodCanvas = createPlaceholder(30, 30, '#FFD700', 'Food');
-        
-        this.images.background = bgCanvas;
-        this.images.hamster = hamsterCanvas;
-        this.images.food = foodCanvas;
+        this.images.background = createBackground();
+        this.images.hamster = createHamster();
+        this.images.food = createFood();
     }
     
     loadImage(src, key) {
@@ -180,14 +255,17 @@ class HamsterGame {
             // Проверяем столкновение с хомяком
             if (this.checkCollision(this.hamster, foodItem)) {
                 this.score += 10;
+                this.foodCaught++;
                 this.food.splice(i, 1);
                 this.updateScore();
+                this.createEffect(foodItem.x, foodItem.y, '+10');
                 continue;
             }
             
             // Удаляем еду, которая упала за пределы экрана
             if (foodItem.y > this.canvasHeight) {
                 this.food.splice(i, 1);
+                this.foodMissed++;
             }
         }
     }
@@ -199,35 +277,51 @@ class HamsterGame {
                rect1.y + rect1.height > rect2.y;
     }
     
+    createEffect(x, y, text) {
+        this.effects.push({
+            x: x,
+            y: y,
+            text: text,
+            life: 60,
+            maxLife: 60
+        });
+    }
+    
+    updateEffects() {
+        for (let i = this.effects.length - 1; i >= 0; i--) {
+            const effect = this.effects[i];
+            effect.life--;
+            effect.y -= 1;
+            
+            if (effect.life <= 0) {
+                this.effects.splice(i, 1);
+            }
+        }
+    }
+    
+    drawEffects() {
+        this.effects.forEach(effect => {
+            const alpha = effect.life / effect.maxLife;
+            this.ctx.fillStyle = `rgba(255, 255, 0, ${alpha})`;
+            this.ctx.font = 'bold 20px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(effect.text, effect.x, effect.y);
+        });
+    }
+    
     updateScore() {
-        this.scoreElement.textContent = `Очки: ${this.score}`;
+        this.scoreElement.textContent = `Очки: ${this.score} | Поймано: ${this.foodCaught} | Пропущено: ${this.foodMissed}`;
     }
     
     drawBackground() {
         if (this.images.background) {
             this.ctx.drawImage(this.images.background, 0, 0, this.canvasWidth, this.canvasHeight);
-        } else {
-            this.ctx.fillStyle = '#87CEEB';
-            this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
         }
     }
     
     drawHamster() {
         if (this.images.hamster) {
             this.ctx.drawImage(this.images.hamster, this.hamster.x, this.hamster.y, this.hamster.width, this.hamster.height);
-        } else {
-            // Рисуем простого хомяка
-            this.ctx.fillStyle = '#8B4513';
-            this.ctx.fillRect(this.hamster.x, this.hamster.y, this.hamster.width, this.hamster.height);
-            
-            // Глаза
-            this.ctx.fillStyle = 'black';
-            this.ctx.fillRect(this.hamster.x + 15, this.hamster.y + 15, 5, 5);
-            this.ctx.fillRect(this.hamster.x + 40, this.hamster.y + 15, 5, 5);
-            
-            // Нос
-            this.ctx.fillStyle = 'pink';
-            this.ctx.fillRect(this.hamster.x + 27, this.hamster.y + 25, 6, 4);
         }
     }
     
@@ -235,14 +329,6 @@ class HamsterGame {
         this.food.forEach(foodItem => {
             if (this.images.food) {
                 this.ctx.drawImage(this.images.food, foodItem.x, foodItem.y, foodItem.width, foodItem.height);
-            } else {
-                // Рисуем простую еду
-                this.ctx.fillStyle = '#FFD700';
-                this.ctx.fillRect(foodItem.x, foodItem.y, foodItem.width, foodItem.height);
-                
-                // Добавляем детали
-                this.ctx.fillStyle = '#FFA500';
-                this.ctx.fillRect(foodItem.x + 5, foodItem.y + 5, 20, 20);
             }
         });
     }
@@ -251,6 +337,7 @@ class HamsterGame {
         this.drawBackground();
         this.drawFood();
         this.drawHamster();
+        this.drawEffects();
     }
     
     gameOver() {
@@ -261,8 +348,11 @@ class HamsterGame {
     
     restartGame() {
         this.score = 0;
+        this.foodCaught = 0;
+        this.foodMissed = 0;
         this.gameRunning = true;
         this.food = [];
+        this.effects = [];
         this.foodSpawnTimer = 0;
         this.hamster.x = this.canvasWidth / 2;
         this.gameOverElement.style.display = 'none';
@@ -273,6 +363,7 @@ class HamsterGame {
         if (this.gameRunning) {
             this.spawnFood();
             this.updateFood();
+            this.updateEffects();
             this.draw();
         }
         
