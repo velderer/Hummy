@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Генерация реальных PNG изображений</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .canvas-container { margin: 20px 0; border: 1px solid #ccc; padding: 10px; }
+        canvas { border: 1px solid #333; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1>🎨 Генерация PNG изображений для игры</h1>
+    <p>Нажмите кнопки ниже, чтобы создать и скачать PNG изображения:</p>
+    
+    <div class="canvas-container">
+        <h3>Background (800x600)</h3>
+        <canvas id="bgCanvas" width="800" height="600"></canvas>
+        <br>
+        <button onclick="generateBackground()">Создать Background/fon.png</button>
+    </div>
+    
+    <div class="canvas-container">
+        <h3>Hamster (60x60)</h3>
+        <canvas id="hamsterCanvas" width="60" height="60"></canvas>
+        <br>
+        <button onclick="generateHamster()">Создать Sprites/hummy.png</button>
+    </div>
+    
+    <div class="canvas-container">
+        <h3>Food (30x30)</h3>
+        <canvas id="foodCanvas" width="30" height="30"></canvas>
+        <br>
+        <button onclick="generateFood()">Создать Sprites/eat.png</button>
+    </div>
+    
+    <div class="canvas-container">
+        <h3>Все изображения сразу</h3>
+        <button onclick="generateAll()" style="background: #4CAF50; color: white;">Создать все изображения</button>
+    </div>
+    
+    <script>
+        function generateBackground() {
+            const canvas = document.getElementById('bgCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Градиентный фон
+            const gradient = ctx.createLinearGradient(0, 0, 0, 600);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(1, '#98FB98');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 800, 600);
+            
+            // Облака
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.beginPath();
+            ctx.arc(100, 100, 30, 0, Math.PI * 2);
+            ctx.arc(130, 100, 40, 0, Math.PI * 2);
+            ctx.arc(160, 100, 30, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(600, 80, 25, 0, Math.PI * 2);
+            ctx.arc(630, 80, 35, 0, Math.PI * 2);
+            ctx.arc(660, 80, 25, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Добавляем солнце
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(700, 100, 40, 0, Math.PI * 2);
+            ctx.fill();
+            
+            downloadImage(canvas, 'Background/fon.png');
+        }
+        
+        function generateHamster() {
+            const canvas = document.getElementById('hamsterCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Тело хомяка (более детальное)
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(10, 20, 40, 30);
+            
+            // Голова
+            ctx.fillStyle = '#A0522D';
+            ctx.fillRect(5, 10, 25, 25);
+            
+            // Уши (более круглые)
+            ctx.fillStyle = '#CD853F';
+            ctx.beginPath();
+            ctx.arc(12, 12, 6, 0, Math.PI * 2);
+            ctx.arc(23, 12, 6, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Глаза
+            ctx.fillStyle = 'black';
+            ctx.fillRect(12, 18, 3, 3);
+            ctx.fillRect(20, 18, 3, 3);
+            
+            // Белки глаз
+            ctx.fillStyle = 'white';
+            ctx.fillRect(11, 17, 5, 5);
+            ctx.fillRect(19, 17, 5, 5);
+            
+            // Нос
+            ctx.fillStyle = 'pink';
+            ctx.fillRect(16, 22, 3, 2);
+            
+            // Щеки
+            ctx.fillStyle = '#FFB6C1';
+            ctx.beginPath();
+            ctx.arc(10, 27, 3, 0, Math.PI * 2);
+            ctx.arc(25, 27, 3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Лапки
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(15, 45, 4, 8);
+            ctx.fillRect(31, 45, 4, 8);
+            
+            downloadImage(canvas, 'Sprites/hummy.png');
+        }
+        
+        function generateFood() {
+            const canvas = document.getElementById('foodCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Основная форма еды (более детальная)
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(5, 5, 20, 20);
+            
+            // Детали
+            ctx.fillStyle = '#FFA500';
+            ctx.fillRect(8, 8, 14, 14);
+            
+            // Блики
+            ctx.fillStyle = '#FFFF00';
+            ctx.fillRect(10, 10, 3, 3);
+            ctx.fillRect(18, 15, 2, 2);
+            
+            // Тень
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillRect(6, 6, 18, 18);
+            
+            // Контур
+            ctx.strokeStyle = '#FF8C00';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(5, 5, 20, 20);
+            
+            downloadImage(canvas, 'Sprites/eat.png');
+        }
+        
+        function generateAll() {
+            generateBackground();
+            setTimeout(() => generateHamster(), 500);
+            setTimeout(() => generateFood(), 1000);
+        }
+        
+        function downloadImage(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            console.log(`✅ Изображение ${filename} создано!`);
+        }
+        
+        // Предварительная отрисовка
+        window.onload = function() {
+            generateBackground();
+            generateHamster();
+            generateFood();
+        };
+    </script>
+</body>
+</html>

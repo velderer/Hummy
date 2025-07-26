@@ -53,16 +53,13 @@ class HamsterGame {
     }
     
     loadImages() {
-        // Создаем простые placeholder изображения, если файлы не загружены
+        // Создаем простые placeholder изображения как fallback
         this.createPlaceholderImages();
         
-        // Пытаемся загрузить реальные изображения (PNG и SVG)
+        // Пытаемся загрузить реальные изображения
         this.loadImage('Background/fon.png', 'background');
-        this.loadImage('Background/fon.svg', 'background');
         this.loadImage('Sprites/hummy.png', 'hamster');
-        this.loadImage('Sprites/hummy.svg', 'hamster');
         this.loadImage('Sprites/eat.png', 'food');
-        this.loadImage('Sprites/eat.svg', 'food');
     }
     
     createPlaceholderImages() {
@@ -165,10 +162,11 @@ class HamsterGame {
     loadImage(src, key) {
         const img = new Image();
         img.onload = () => {
+            console.log(`✅ Загружено изображение: ${src}`);
             this.images[key] = img;
         };
         img.onerror = () => {
-            console.log(`Не удалось загрузить изображение: ${src}`);
+            console.log(`❌ Не удалось загрузить изображение: ${src}`);
         };
         img.src = src;
     }
